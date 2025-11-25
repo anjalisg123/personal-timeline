@@ -81,13 +81,13 @@ const Dashboard: React.FC = () => {
     return null;
   };
 
-  // --- NEW: Helper for Date Consistency ---
+
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
     const normalized = dateString.endsWith("Z") ? dateString : `${dateString}Z`;
     return new Date(normalized).toLocaleString();
   };
-  // ----------------------------------------
+
 
   return (
     <div className="p-6">

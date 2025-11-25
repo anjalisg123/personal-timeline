@@ -1037,7 +1037,7 @@ app.UseStaticFiles();
 app.MapControllers();
 app.Run();
 
-// ================== Types (must be AFTER top-level statements) ==================
+
 public record GoogleLoginRequest(string IdToken);
 public record UpdateProfileReq(string? name, string? picture);
 
