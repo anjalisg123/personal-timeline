@@ -1,6 +1,3 @@
-
-
-
 using Microsoft.EntityFrameworkCore;
 
 namespace TimelineApi.Data;

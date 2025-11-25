@@ -21,9 +21,9 @@ public class TimelineEntry
     public DateTime UpdatedAt { get; set; }
 
     // NEW FILE ATTACHMENT FIELDS
-    public string FileAttachment { get; set; } = string.Empty;   // base64 data or URL
+    public string FileAttachment { get; set; } = string.Empty;   
     public string FileName { get; set; } = string.Empty;
-    public string FileType { get; set; } = string.Empty;         // e.g. "image/png", "application/pdf"
+    public string FileType { get; set; } = string.Empty;         
     
 
     public User User { get; set; }
