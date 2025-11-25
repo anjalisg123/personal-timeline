@@ -11,6 +11,7 @@ using TimelineApi.Data;
 using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Net.Http.Headers;
+using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,11 +46,51 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 
+
+// ---------- SWAGGER SETUP WITH AUTH BUTTON (NEW) ----------
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    // This adds the "Authorize" button to Swagger UI
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+
+
 // ---------- EF Core ----------
 builder.Services.AddDbContext<AppDb>(opt =>
     opt.UseSqlite(builder.Configuration.GetConnectionString("Sqlite")));
 
 var app = builder.Build();
+
+// ---------- SWAGGER MIDDLEWARE (NEW) ----------
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // ---------- Migrate on startup ----------
 using (var scope = app.Services.CreateScope())
@@ -319,7 +360,7 @@ app.MapGet("/api/entries", [Authorize] async (ClaimsPrincipal user, AppDb db) =>
         .Select(e => new {
             e.Id, e.Title, e.Description, e.EntryType, e.Category, e.SourceApi,
             e.EventDate, e.CreatedAt, e.ExternalUrl,
-            e.FileAttachment, e.FileName, e.FileType, e.Metadata // ADD THESE THREE
+            e.FileAttachment, e.FileName, e.FileType, e.Metadata 
         })
         .ToListAsync();
 
@@ -345,9 +386,9 @@ app.MapPost("/api/entries", [Authorize] async (ClaimsPrincipal user, AppDb db, C
         ImageUrl    = body.imageUrl ?? "",            
         ExternalId  = body.externalId ?? "",          
         Metadata    = body.metadata ?? "{}",   
-        FileAttachment = body.fileAttachment ?? "",  // ADD THIS
-        FileName = body.fileName ?? "",              // ADD THIS
-        FileType = body.fileType ?? "",              // ADD THIS       
+        FileAttachment = body.fileAttachment ?? "", 
+        FileName = body.fileName ?? "",              
+        FileType = body.fileType ?? "",                   
         UserId      = uid.Value,
         CreatedAt   = DateTime.UtcNow,
         UpdatedAt   = DateTime.UtcNow
@@ -375,9 +416,9 @@ app.MapPut("/api/entries/{id}", [Authorize] async (int id, ClaimsPrincipal user,
     if (body.sourceApi is not null)   e.SourceApi   = body.sourceApi;
     if (body.eventDate is not null)   e.EventDate   = body.eventDate.Value;
     if (body.externalUrl is not null) e.ExternalUrl = body.externalUrl;
-    if (body.fileAttachment is not null) e.FileAttachment = body.fileAttachment;  // ADD THIS
-    if (body.fileName is not null) e.FileName = body.fileName;                    // ADD THIS
-    if (body.fileType is not null) e.FileType = body.fileType;                    // ADD THIS
+    if (body.fileAttachment is not null) e.FileAttachment = body.fileAttachment;  
+    if (body.fileName is not null) e.FileName = body.fileName;                    
+    if (body.fileType is not null) e.FileType = body.fileType;                    
 
     e.UpdatedAt = DateTime.UtcNow;
 
@@ -1011,9 +1052,9 @@ public record CreateEntryReqDto(
     string? imageUrl,        
     string? externalId,      
     string? metadata,
-    string? fileAttachment,  // ADD THIS
-    string? fileName,        // ADD THIS
-    string? fileType         // ADD THIS     
+    string? fileAttachment,  
+    string? fileName,        
+    string? fileType             
 );
 
 public record UpdateEntryReqDto(
@@ -1027,9 +1068,9 @@ public record UpdateEntryReqDto(
     string? imageUrl,        
     string? externalId,      
     string? metadata,
-    string? fileAttachment,  // ADD THIS
-    string? fileName,        // ADD THIS
-    string? fileType         // ADD THIS       
+    string? fileAttachment,  
+    string? fileName,        
+    string? fileType             
 );
 
 

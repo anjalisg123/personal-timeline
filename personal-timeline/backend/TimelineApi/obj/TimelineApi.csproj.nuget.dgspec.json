@@ -45,25 +45,29 @@
           "dependencies": {
             "Google.Apis.Auth": {
               "target": "Package",
-              "version": "[1.72.0, )"
+              "version": "[1.67.0, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
-              "version": "[8.0.10, )"
+              "version": "[8.0.2, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.10, )"
+              "version": "[8.0.2, )"
             },
             "Microsoft.EntityFrameworkCore.Sqlite": {
               "target": "Package",
-              "version": "[9.0.10, )"
+              "version": "[8.0.2, )"
             },
-            "System.IdentityModel.Tokens.Jwt": {
+            "Microsoft.OpenApi": {
               "target": "Package",
-              "version": "[7.7.0, )"
+              "version": "[1.6.14, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.5.0, )"
             }
           },
           "imports": [

@@ -31,21 +31,19 @@ This project was built to demonstrate mastery of full-stack development using **
 
 ## 📋 Prerequisites
 
-Before running this application, ensure you have the following installed on your machine:
+Before running this application, ensure you have the following installed:
 
 * **Node.js (v18 or higher)**
-* **A Code Editor (VS Code recommended)**
+* **VS Code or any preferred editor**
 * **.NET 8 SDK**
 
 ---
 
 ## 🚀 Setup & Installation Instructions
 
-Follow these steps to run the application locally from scratch.
+Follow these steps to run the application locally.
 
----
-
-## 1. Clone the Repository
+### **1. Clone the Repository**
 
 ```bash
 git clone <YOUR_REPO_URL_HERE>
@@ -56,13 +54,13 @@ cd <YOUR_REPO_NAME>
 
 ## 2. Backend Setup (.NET)
 
-Navigate to the backend project directory (e.g., `TimelineApi`):
+Navigate to the backend directory:
 
 ```bash
 cd TimelineApi
 ```
 
-### Install Dependencies & Restore Packages
+### Install Dependencies
 
 ```bash
 dotnet restore
@@ -70,55 +68,59 @@ dotnet restore
 
 ### Database Setup
 
-This project uses SQLite. You must apply the migrations to create the local database file (`app.db`).
-
 ```bash
-# Install EF Core tools globally
-
+# Install EF Core tools
 dotnet tool install --global dotnet-ef
 
 # Apply migrations
 dotnet ef database update
 ```
 
-### Configuration (`appsettings.json`)
+### Configuration
 
-Ensure your `appsettings.Development.json` contains the required API keys.
+Ensure `appsettings.Development.json` contains the required secrets.
 
-*You can run the app without third‑party keys, but sync features won't work.*
-
-### Run the Backend
-
-
-Run the following command to start the server explicitly on port 5001:
+### Run Backend
 
 ```bash
 dotnet run --urls "http://localhost:5001"
+```
+
+Backend will run at:
+
+```
+http://localhost:5001
+```
+
+Swagger UI:
+
+```
+http://localhost:5001/swagger/index.html
 ```
 
 ---
 
 ## 3. Frontend Setup (React)
 
-Navigate to your frontend folder:
+Navigate:
 
 ```bash
 cd frontend
 ```
 
-### Install Node Modules
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### Run the Frontend
+Run frontend:
 
 ```bash
 npm run dev
 ```
 
-The frontend will be available at:
+Accessible at:
 
 ```
 http://localhost:5173
@@ -126,13 +128,32 @@ http://localhost:5173
 
 ---
 
+## 📚 API Documentation (Swagger)
+
+Access Swagger at:
+
+```
+http://localhost:5001/swagger/index.html
+```
+
+### Authorizing Swagger with JWT
+
+1. Login in the frontend (Google Sign-In).
+2. Open DevTools → Application → Local Storage.
+3. Copy value of `pt_jwt`.
+4. In Swagger → Authorize → enter:
+
+```
+Bearer <TOKEN>
+```
+
+You can now test protected endpoints.
+
+---
+
 ## 🔑 Configuration & Environment Variables
 
-To fully enable third‑party sync (GitHub, Strava, Spotify) and Google Login, set the following in:
-
-```
-TimelineApi/appsettings.Development.json
-```
+File: `TimelineApi/appsettings.Development.json`
 
 ```json
 {
@@ -177,76 +198,56 @@ TimelineApi/appsettings.Development.json
 
 ## ✨ Features & Requirements Met
 
-### **1. Authentication System ✔️**
+### **1. Authentication System**
 
 * Google OAuth Login
-* JWT‑based session management
+* JWT-secured API
 * Protected routes
-* User stored with OAuth IDs
+* Stateless session handling
 
-### **2. Personal Timeline Management ✔️**
+### **2. Personal Timeline Management**
 
-* Full CRUD for timeline entries
+* Full CRUD for entries
 * Image & file uploads
-* Polymorphic metadata for API entries
-* Filters: date range, entry type, source
-* Local timezone conversion
+* Polymorphic metadata
+* Filters: date, source, type
+* Automatic timezone correction
 
-### **3. Third‑Party API Integrations ✔️**
+### **3. Third-Party Integrations**
 
-* GitHub: Sync push events, pull requests
-* Strava: Sync runs, rides, workouts
-* Spotify: Sync recently played tracks
-* Sync avoids duplicates
+* GitHub: push & PR sync
+* Strava: workouts sync
+* Spotify: recent tracks sync
+* Duplicate prevention logic
 
-### **4. Database Design ✔️**
+### **4. Database Design**
 
-* User entity (OAuth + profile)
-* TimelineEntry (manual + API entries)
-* ApiConnection (tokens + sync status)
-* Entity Framework Core for data access
-
----
-
-## 🧪 Testing the API
-
-Open Swagger UI:
-
-```
-http://localhost:5001/swagger/index.html
-```
-
-### Key Endpoints
-
-* `GET /api/me` — get current user profile
-* `GET /api/entries` — list timeline entries
-* `POST /api/upload` — upload files
-* `POST /api/connections/{provider}/sync` — sync external services
+* EF Core with SQLite
+* User entity
+* TimelineEntry entity
+* ApiConnection entity
 
 ---
 
 ## 📝 Troubleshooting
 
-### **Images not loading?**
+### Images not loading?
 
 Backend must run on **port 5001**.
 
-### **Database errors?**
+### Database error on startup?
 
-Ensure:
+Run:
 
 ```bash
 dotnet ef database update
 ```
 
-was executed.
-
-### **CORS issues?**
+### CORS error?
 
 Frontend must run on:
 
 ```
 http://localhost:5173
 ```
-
 
