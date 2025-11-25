@@ -1,116 +1,145 @@
-Personal Timeline Project
+# Personal Timeline Project
 
-Overview
+## Overview
 
 Personal Timeline is a full-stack web application that serves as a digital journal. It allows users to track personal events, achievements, and activities manually or by automatically syncing with third-party digital services.
 
-This project was built to demonstrate mastery of full-stack development using .NET 8 (Backend) and React + TypeScript (Frontend), incorporating OAuth authentication, Entity Framework Core, and complex API integrations.
+This project was built to demonstrate mastery of full-stack development using **.NET 8 (Backend)** and **React + TypeScript (Frontend)**, incorporating **OAuth authentication**, **Entity Framework Core**, and **complex API integrations**.
 
-🛠 Tech Stack
+---
 
-Backend
+## 🛠 Tech Stack
 
-Framework: .NET 8 (Minimal API)
+### **Backend**
 
-Database: SQLite (Development)
+* **Framework:** .NET 8 (Minimal API)
+* **Database:** SQLite (Development)
+* **ORM:** Entity Framework Core
+* **Authentication:** JWT (JSON Web Tokens) & Google OAuth
+* **Documentation:** Swagger / OpenAPI
 
-ORM: Entity Framework Core
+### **Frontend**
 
-Authentication: JWT (JSON Web Tokens) & Google OAuth
+* **Framework:** React 18
+* **Build Tool:** Vite
+* **Language:** TypeScript
+* **Styling:** CSS Modules / Tailwind-like utility classes
+* **Routing:** React Router DOM
+* **State Management:** React Context API
 
-Documentation: Swagger / OpenAPI
+---
 
-Frontend
-
-Framework: React 18
-
-Build Tool: Vite
-
-Language: TypeScript
-
-Styling: CSS Modules / Tailwind-like utility classes
-
-Routing: React Router DOM
-
-State Management: React Context API
-
-📋 Prerequisites
+## 📋 Prerequisites
 
 Before running this application, ensure you have the following installed on your machine:
 
-Node.js (v18 or higher) - Download Here
+* **Node.js (v18 or higher)**
+* **A Code Editor (VS Code recommended)**
+* **.NET 8 SDK**
 
-A Code Editor (VS Code recommended)
+---
 
-🚀 Setup & Installation Instructions
+## 🚀 Setup & Installation Instructions
 
 Follow these steps to run the application locally from scratch.
 
-1. Clone the Repository
+---
 
+## 1. Clone the Repository
+
+```bash
 git clone <YOUR_REPO_URL_HERE>
 cd <YOUR_REPO_NAME>
+```
 
+---
 
-2. Backend Setup (.NET)
+## 2. Backend Setup (.NET)
 
-Navigate to the backend project directory (e.g., TimelineApi):
+Navigate to the backend project directory (e.g., `TimelineApi`):
 
+```bash
 cd TimelineApi
+```
 
+### Install Dependencies & Restore Packages
 
-Install Dependencies & Restore Packages:
-The project uses Entity Framework Core. Run the following commands to restore dependencies:
-
+```bash
 dotnet restore
+```
 
+### Database Setup
 
-Database Setup:
-This project uses SQLite. You must apply the migrations to create the local database file (app.db).
+This project uses SQLite. You must apply the migrations to create the local database file (`app.db`).
 
-# Install EF Core tools globally if you haven't already
+```bash
+# Install EF Core tools globally
+
 dotnet tool install --global dotnet-ef
 
-# Apply migrations to create the database
+# Apply migrations
 dotnet ef database update
+```
 
+### Configuration (`appsettings.json`)
 
-Configuration (appsettings.json):
-Ensure your appsettings.Development.json contains the necessary API keys.
-Note: For security, actual API keys may not be in the repo. You can run the app without them, but Sync features will not work until keys are added.
+Ensure your `appsettings.Development.json` contains the required API keys.
 
-Run the Backend:
+*You can run the app without third‑party keys, but sync features won't work.*
 
-dotnet run
+### Run the Backend
 
+Run this command to start the server on port **5001**:
 
-The backend server should now be running at http://localhost:5001.
+```bash
+dotnet run --urls "http://localhost:5001"
+```
 
-3. Frontend Setup (React)
+The backend server will be available at:
 
-Open a new terminal window and navigate to the frontend directory (e.g., client or frontend):
+```
+http://localhost:5001
+```
 
+---
+
+## 3. Frontend Setup (React)
+
+Navigate to your frontend folder:
+
+```bash
 cd frontend
+```
 
+### Install Node Modules
 
-Install Node Modules:
-
+```bash
 npm install
+```
 
+### Run the Frontend
 
-Run the Frontend:
-
+```bash
 npm run dev
+```
 
+The frontend will be available at:
 
-The frontend application should now be accessible at http://localhost:5173.
+```
+http://localhost:5173
+```
 
-🔑 Configuration & Environment Variables
+---
 
-To fully utilize the Third-Party Sync features (GitHub, Strava, Spotify) and Google Login, you need to configure your secrets.
+## 🔑 Configuration & Environment Variables
 
-In TimelineApi/appsettings.Development.json:
+To fully enable third‑party sync (GitHub, Strava, Spotify) and Google Login, set the following in:
 
+```
+TimelineApi/appsettings.Development.json
+```
+
+```json
 {
   "Logging": {
     "LogLevel": {
@@ -147,77 +176,89 @@ In TimelineApi/appsettings.Development.json:
     "FrontendBase": "http://localhost:5173"
   }
 }
+```
 
+---
 
-✨ Features & Requirements Met
+## ✨ Features & Requirements Met
 
-1. Authentication System ✅
+### **1. Authentication System ✔️**
 
-OAuth Integration: Google Sign-In implemented on Frontend & Backend.
+* Google OAuth Login
+* JWT‑based session management
+* Protected routes
+* User stored with OAuth IDs
 
-User Management: Users are stored in SQLite with OAuth IDs.
+### **2. Personal Timeline Management ✔️**
 
-Protected Routes: API endpoints secured with [Authorize]; Frontend routes protected via ProtectedRoute wrapper.
+* Full CRUD for timeline entries
+* Image & file uploads
+* Polymorphic metadata for API entries
+* Filters: date range, entry type, source
+* Local timezone conversion
 
-Session: JWT implementation for secure stateless sessions.
+### **3. Third‑Party API Integrations ✔️**
 
-2. Personal Timeline Management ✅
+* GitHub: Sync push events, pull requests
+* Strava: Sync runs, rides, workouts
+* Spotify: Sync recently played tracks
+* Sync avoids duplicates
 
-CRUD: Full Create, Read, Update, Delete capabilities for timeline entries.
+### **4. Database Design ✔️**
 
-Rich Content: Support for Image Uploads and File Attachments.
+* User entity (OAuth + profile)
+* TimelineEntry (manual + API entries)
+* ApiConnection (tokens + sync status)
+* Entity Framework Core for data access
 
-Metadata: Dedicated view for complex data from APIs (e.g., Strava distance, Spotify track info).
+---
 
-Filtering: Filter by Date Range, Entry Type, and Source.
+## 🧪 Testing the API
 
-Timezone Handling: Correctly handles UTC to Local time conversion for entries.
+Open Swagger UI:
 
-3. Third-Party API Integration ✅
+```
+http://localhost:5001/swagger/index.html
+```
 
-GitHub: Syncs Push Events and Pull Requests automatically.
+### Key Endpoints
 
-Strava: Syncs Runs, Rides, and Workouts with distance and type.
+* `GET /api/me` — get current user profile
+* `GET /api/entries` — list timeline entries
+* `POST /api/upload` — upload files
+* `POST /api/connections/{provider}/sync` — sync external services
 
-Spotify: Syncs recently played tracks.
+---
 
-Sync Logic: "Sync Now" button checks for duplicates before adding new entries.
+## 📝 Troubleshooting
 
-4. Database Design ✅
+### **Images not loading?**
 
-Entity Framework Core: Used for all data access.
+Backend must run on **port 5001**.
 
-Entities:
+### **Database errors?**
 
-User: Stores profile and OAuth info.
+Ensure:
 
-TimelineEntry: Polymorphic storage for manual notes and API data.
+```bash
+dotnet ef database update
+```
 
-ApiConnection: Manages tokens and sync status (Active/Inactive).
+was executed.
 
-🧪 Testing the API
+### **CORS issues?**
 
-You can explore the API endpoints directly via Swagger UI when the backend is running.
+Frontend must run on:
 
-URL: http://localhost:5001/swagger/index.html
+```
+http://localhost:5173
+```
 
-Key Endpoints:
+---
 
-GET /api/me - Get current user profile.
+If you'd like, I can also:
 
-GET /api/entries - Get all timeline entries.
-
-POST /api/upload - Handle file uploads.
-
-POST /api/connections/{provider}/sync - Trigger data sync.
-
-📝 Troubleshooting
-
-Images not loading?
-Ensure the Backend is running on port 5001. The frontend proxies image requests to the backend http://localhost:5001/api/files/.
-
-Database Error on startup?
-Make sure you ran dotnet ef database update to generate the app.db file.
-
-CORS Error?
-The backend is configured to allow localhost:5173. Ensure you are running the frontend on that specific port.
+* Add screenshots
+* Add architecture diagrams
+* Add badges (build, license, tech stack)
+* Format this README more beautifully
