@@ -89,16 +89,11 @@ Ensure your `appsettings.Development.json` contains the required API keys.
 
 ### Run the Backend
 
-Run this command to start the server on port **5001**:
+
+Run the following command to start the server explicitly on port 5001:
 
 ```bash
 dotnet run --urls "http://localhost:5001"
-```
-
-The backend server will be available at:
-
-```
-http://localhost:5001
 ```
 
 ---
@@ -254,11 +249,4 @@ Frontend must run on:
 http://localhost:5173
 ```
 
----
 
-If you'd like, I can also:
-
-* Add screenshots
-* Add architecture diagrams
-* Add badges (build, license, tech stack)
-* Format this README more beautifully
