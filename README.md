@@ -1,5 +1,8 @@
 # Personal Timeline Project
 
+📺 Demo Video
+https://drive.google.com/file/d/1AmwsbcHlZ6Az4vyU5LjgF3OY1aQkOMVA/view?usp=sharing
+
 ## Overview
 
 Personal Timeline is a full-stack web application that serves as a digital journal. It allows users to track personal events, achievements, and activities manually or by automatically syncing with third-party digital services.
