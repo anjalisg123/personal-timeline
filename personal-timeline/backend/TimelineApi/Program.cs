@@ -15,7 +15,7 @@ using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 var cfg = builder.Configuration;
-var oauthStates = new ConcurrentDictionary<string,int>(); // state -> userId
+var oauthStates = new ConcurrentDictionary<string,int>(); 
 
 
 // ---------- CORS (Vite dev) ----------
@@ -43,6 +43,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddControllers();
+
 // ---------- EF Core ----------
 builder.Services.AddDbContext<AppDb>(opt =>
     opt.UseSqlite(builder.Configuration.GetConnectionString("Sqlite")));
@@ -63,21 +65,20 @@ app.UseAuthorization();
 // ================== Helpers ==================
 static int? GetUserIdInt(ClaimsPrincipal user)
 {
-    // We store our numeric user id in 'uid' claim and mirror it in 'sub'
+
     var uid = user.FindFirst("uid")?.Value
            ?? user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
            ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     return int.TryParse(uid, out var id) ? id : null;
 }
 
-// Build Strava authorize URL
-// Build Strava authorize URL (robust to missing config)
+
 string BuildStravaAuthorizeUrl(HttpRequest req, IConfiguration cfg, string state) {
     var cid = cfg["Strava:ClientId"];
     if (string.IsNullOrWhiteSpace(cid))
         throw new InvalidOperationException("Strava:ClientId is missing in configuration.");
 
-    // Prefer config RedirectUri; fall back to current host
+
     var redirectCfg = cfg["Strava:RedirectUri"];
     var redirect = string.IsNullOrWhiteSpace(redirectCfg)
         ? $"{req.Scheme}://{req.Host}/api/oauth/strava/callback"
@@ -94,7 +95,7 @@ string BuildStravaAuthorizeUrl(HttpRequest req, IConfiguration cfg, string state
 }
 
 
-// Exchange code -> tokens
+
 async Task<(string access, string refresh, DateTime expiresAtUtc, long athleteId)>
 ExchangeStravaTokenAsync(IConfiguration cfg, string code) {
     using var hc = new HttpClient();
@@ -115,7 +116,7 @@ ExchangeStravaTokenAsync(IConfiguration cfg, string code) {
     return (access, refresh, exp, athlete);
 }
 
-// Refresh if needed; returns valid access token (and updates DB)
+
 async Task<string> EnsureStravaAccessTokenAsync(ApiConnection row, IConfiguration cfg, AppDb db) {
     if (row.TokenExpiresAt.HasValue && row.TokenExpiresAt.Value > DateTime.UtcNow.AddMinutes(2))
         return row.AccessToken!;
@@ -145,8 +146,8 @@ string CreateJwt(int internalUserId, string? email, string? name, string? google
 
     var claims = new List<Claim>
     {
-        new("uid", internalUserId.ToString()),              // our internal int id
-        new(JwtRegisteredClaimNames.Sub, googleSub ?? ""), // google subject (string)
+        new("uid", internalUserId.ToString()),              
+        new(JwtRegisteredClaimNames.Sub, googleSub ?? ""), 
         new(JwtRegisteredClaimNames.Email, email ?? string.Empty),
         new("name", name ?? string.Empty)
     };
@@ -174,7 +175,7 @@ string BuildSpotifyAuthorizeUrl(HttpRequest req, IConfiguration cfg, string stat
         ? $"{req.Scheme}://{req.Host}/api/oauth/spotify/callback"
         : redirectCfg;
 
-    // scopes for timeline use
+
     var scopes = "user-read-recently-played user-read-currently-playing user-top-read";
     return "https://accounts.spotify.com/authorize"
          + $"?client_id={Uri.EscapeDataString(cid)}"
@@ -202,7 +203,7 @@ ExchangeSpotifyTokenAsync(IConfiguration cfg, string code)
 
     var access = json.GetProperty("access_token").GetString()!;
     var refresh = json.GetProperty("refresh_token").GetString()!;
-    var expiresIn = json.GetProperty("expires_in").GetInt32(); // seconds
+    var expiresIn = json.GetProperty("expires_in").GetInt32(); 
     return (access, refresh, DateTime.UtcNow.AddSeconds(expiresIn - 60));
 }
 
@@ -223,7 +224,7 @@ async Task<string> EnsureSpotifyAccessTokenAsync(ApiConnection row, IConfigurati
     var json = JsonDocument.Parse(await resp.Content.ReadAsStringAsync()).RootElement;
 
     row.AccessToken = json.GetProperty("access_token").GetString()!;
-    // Spotify may or may not return a new refresh_token
+
     if (json.TryGetProperty("refresh_token", out var rtk) && rtk.GetString() is string newRef && !string.IsNullOrEmpty(newRef))
         row.RefreshToken = newRef;
 
@@ -243,7 +244,7 @@ string BuildGitHubAuthorizeUrl(HttpRequest req, IConfiguration cfg, string state
         ? $"{req.Scheme}://{req.Host}/api/oauth/github/callback"
         : redirectCfg;
 
-    // scopes: public events work with none; add read:user + repo if you want private events
+
     var scope = "read:user,repo";
     return "https://github.com/login/oauth/authorize"
          + $"?client_id={Uri.EscapeDataString(cid)}"
@@ -268,7 +269,7 @@ async Task<string> ExchangeGitHubTokenAsync(IConfiguration cfg, string code)
     return json.GetProperty("access_token").GetString()!;
 }
 
-// GitHub tokens don't refresh; just return the current one
+
 Task<string> EnsureGitHubAccessTokenAsync(ApiConnection row) =>
     Task.FromResult(row.AccessToken!);
 
@@ -317,7 +318,8 @@ app.MapGet("/api/entries", [Authorize] async (ClaimsPrincipal user, AppDb db) =>
         .Take(500)
         .Select(e => new {
             e.Id, e.Title, e.Description, e.EntryType, e.Category, e.SourceApi,
-            e.EventDate, e.CreatedAt, e.ExternalUrl
+            e.EventDate, e.CreatedAt, e.ExternalUrl,
+            e.FileAttachment, e.FileName, e.FileType, e.Metadata // ADD THESE THREE
         })
         .ToListAsync();
 
@@ -334,15 +336,18 @@ app.MapPost("/api/entries", [Authorize] async (ClaimsPrincipal user, AppDb db, C
 
     var e = new TimelineEntry {
         Title       = body.title,
-        Description = body.description ?? "",         // non-null
-        EntryType   = entryType,                      // non-null
-        Category    = body.category ?? "",            // non-null
-        SourceApi   = src,                            // non-null
+        Description = body.description ?? "",         
+        EntryType   = entryType,                      
+        Category    = body.category ?? "",            
+        SourceApi   = src,                            
         EventDate   = body.eventDate,
-        ExternalUrl = body.externalUrl ?? "",         // non-null
-        ImageUrl    = body.imageUrl ?? "",            // non-null
-        ExternalId  = body.externalId ?? "",          // non-null
-        Metadata    = body.metadata ?? "{}",          // non-null JSON string
+        ExternalUrl = body.externalUrl ?? "",         
+        ImageUrl    = body.imageUrl ?? "",            
+        ExternalId  = body.externalId ?? "",          
+        Metadata    = body.metadata ?? "{}",   
+        FileAttachment = body.fileAttachment ?? "",  // ADD THIS
+        FileName = body.fileName ?? "",              // ADD THIS
+        FileType = body.fileType ?? "",              // ADD THIS       
         UserId      = uid.Value,
         CreatedAt   = DateTime.UtcNow,
         UpdatedAt   = DateTime.UtcNow
@@ -370,6 +375,9 @@ app.MapPut("/api/entries/{id}", [Authorize] async (int id, ClaimsPrincipal user,
     if (body.sourceApi is not null)   e.SourceApi   = body.sourceApi;
     if (body.eventDate is not null)   e.EventDate   = body.eventDate.Value;
     if (body.externalUrl is not null) e.ExternalUrl = body.externalUrl;
+    if (body.fileAttachment is not null) e.FileAttachment = body.fileAttachment;  // ADD THIS
+    if (body.fileName is not null) e.FileName = body.fileName;                    // ADD THIS
+    if (body.fileType is not null) e.FileType = body.fileType;                    // ADD THIS
 
     e.UpdatedAt = DateTime.UtcNow;
 
@@ -434,7 +442,7 @@ app.MapPost("/api/auth/google", async (GoogleLoginRequest req, AppDb db) =>
             ApiConnections  = new List<ApiConnection>()
         };
         db.Users.Add(dbUser);
-        await db.SaveChangesAsync(); // assign int Id
+        await db.SaveChangesAsync(); 
     }
     else
     {
@@ -458,10 +466,6 @@ app.MapPost("/api/auth/google", async (GoogleLoginRequest req, AppDb db) =>
 app.MapGet("/", () => new { ok = true, service = "TimelineApi" });
 app.MapGet("/_routes", (IEnumerable<EndpointDataSource> sources) =>
     sources.SelectMany(s => s.Endpoints).Select(e => e.DisplayName));
-
-
-
-
 
 
 // ================== Api Connections ==================
@@ -544,12 +548,12 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
 
     if (provider == "strava")
     {
-        // ensure token
+
         var access = await EnsureStravaAccessTokenAsync(row, cfg, db);
         using var hc = new HttpClient();
         hc.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", access);
 
-        // initial backfill window
+
         var after = row.LastSyncAt ?? DateTime.UtcNow.AddMonths(-6);
         var afterUnix = new DateTimeOffset(after).ToUnixTimeSeconds();
 
@@ -572,7 +576,6 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
                 var distance = a.TryGetProperty("distance", out var d) ? d.GetDouble() : 0.0;
                 var start = DateTime.Parse(a.GetProperty("start_date").GetString()!, null, System.Globalization.DateTimeStyles.AdjustToUniversal);
 
-                // get full activity for polyline (optional)
                 var detailResp = await hc.GetAsync($"https://www.strava.com/api/v3/activities/{id}");
                 string? poly = null;
                 if (detailResp.IsSuccessStatusCode)
@@ -582,7 +585,6 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
                         poly = sp.GetString();
                 }
 
-                // upsert TimelineEntry using your schema
                 var existing = await db.Entries.FirstOrDefaultAsync(e =>
                     e.UserId == uid.Value && e.SourceApi == "strava" && e.ExternalId == id.ToString());
 
@@ -632,11 +634,10 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
         using var hc = new HttpClient();
         hc.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", access);
 
-        // decide window: use LastSyncAt (server UTC) -> convert to ms epoch
+
         var after = row.LastSyncAt ?? DateTime.UtcNow.AddMonths(-3);
         var afterMs = new DateTimeOffset(after).ToUnixTimeMilliseconds();
 
-        // Recently played
         var url = $"https://api.spotify.com/v1/me/player/recently-played?limit=50&after={afterMs}";
         var resp = await hc.GetAsync(url);
         if (!resp.IsSuccessStatusCode)
@@ -702,7 +703,7 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
         hc.DefaultRequestHeaders.UserAgent.ParseAdd("PersonalTimeline/1.0");
         hc.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
 
-        // who am I?
+
         var meResp = await hc.GetAsync("https://api.github.com/user");
         meResp.EnsureSuccessStatusCode();
         var meJson = JsonDocument.Parse(await meResp.Content.ReadAsStringAsync()).RootElement;
@@ -711,14 +712,14 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
         var afterUtc = row.LastSyncAt ?? DateTime.UtcNow.AddMonths(-3);
         var count = 0;
 
-        // basic pagination: GitHub returns 30 by default; include more if you like via ?per_page=100
+
         var eventsResp = await hc.GetAsync($"https://api.github.com/users/{login}/events?per_page=100");
         eventsResp.EnsureSuccessStatusCode();
         var eventsRoot = JsonDocument.Parse(await eventsResp.Content.ReadAsStringAsync()).RootElement;
 
         foreach (var ev in eventsRoot.EnumerateArray())
         {
-            // Required top-level fields (defensive)
+
             if (!ev.TryGetProperty("type", out var typeEl) ||
                 !ev.TryGetProperty("created_at", out var createdEl) ||
                 !ev.TryGetProperty("repo", out var repoEl))
@@ -794,13 +795,13 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
                     }
 
                     default:
-                        // quietly skip other event types (ForkEvent, WatchEvent, etc.)
+
                         continue;
                 }
             }
             catch
             {
-                // any unexpected JSON shape → skip event instead of 500
+
                 continue;
             }
 
@@ -846,7 +847,7 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
 
 
 
-    // default fallback for other providers (keep your previous behavior)
+
     row.LastSyncAt = DateTime.UtcNow;
     await db.SaveChangesAsync();
     return Results.Ok(new { ok = true, provider, lastSyncAt = row.LastSyncAt });
@@ -858,11 +859,11 @@ app.MapGet("/api/oauth/strava/connect", [Authorize] (HttpRequest req, ClaimsPrin
     var uid = GetUserIdInt(user);
     if (uid is null) return Results.Unauthorized();
 
-    var state = Convert.ToBase64String(Guid.NewGuid().ToByteArray()); // random
+    var state = Convert.ToBase64String(Guid.NewGuid().ToByteArray()); 
     oauthStates[state] = uid.Value;
 
     var url = BuildStravaAuthorizeUrl(req, cfg, state);
-    return Results.Redirect(url); // browser navigation
+    return Results.Redirect(url); 
 });
 
 
@@ -883,12 +884,11 @@ app.MapGet("/api/oauth/strava/callback", async (
     row.AccessToken = access;
     row.RefreshToken = refresh;
     row.TokenExpiresAt = expUtc;
-    // also stash athlete id in Settings JSON
+
     row.Settings = System.Text.Json.JsonSerializer.Serialize(new { athleteId });
     row.LastSyncAt = null;
     await db.SaveChangesAsync();
 
-    // Go back to your Settings page
     var front = cfg["App:FrontendBase"] ?? "http://localhost:5173";
     return Results.Redirect($"{front}/settings?connected=strava");
 });
@@ -899,8 +899,7 @@ app.MapPost("/api/oauth/strava/connect-url", [Authorize] (HttpRequest req, Claim
     if (uid is null) return Results.Unauthorized();
 
     var state = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-    // save state -> userId so we can trust it later in the callback
-    // (same dictionary you already have)
+
     oauthStates[state] = uid.Value;
 
     var url = BuildStravaAuthorizeUrl(req, cfg, state);
@@ -946,7 +945,7 @@ app.MapGet("/api/oauth/spotify/callback", async (string code, string state, AppD
     row.RefreshToken = refresh;
     row.TokenExpiresAt = expUtc;
     row.Settings = "{}";
-    row.LastSyncAt = null; // backfill on first sync
+    row.LastSyncAt = null; 
 
     await db.SaveChangesAsync();
 
@@ -982,9 +981,9 @@ app.MapGet("/api/oauth/github/callback", async (string code, string state, AppDb
     row.IsActive = true;
     row.AccessToken = access;
     row.RefreshToken = null;
-    row.TokenExpiresAt = null;      // GitHub OAuth tokens are long-lived, no refresh
+    row.TokenExpiresAt = null;      
     row.Settings = "{}";
-    row.LastSyncAt = null;          // force backfill on first sync
+    row.LastSyncAt = null;      
 
     await db.SaveChangesAsync();
 
@@ -993,6 +992,8 @@ app.MapGet("/api/oauth/github/callback", async (string code, string state, AppDb
 });
 
 
+app.UseStaticFiles();
+app.MapControllers();
 app.Run();
 
 // ================== Types (must be AFTER top-level statements) ==================
@@ -1002,27 +1003,33 @@ public record UpdateProfileReq(string? name, string? picture);
 public record CreateEntryReqDto(
     string title,
     string? description,
-    string? entryType,   // string on purpose
+    string? entryType,   
     string? category,
     string? sourceApi,
     DateTime eventDate,
     string? externalUrl,
-    string? imageUrl,        // NEW
-    string? externalId,      // NEW
-    string? metadata         // NEW (JSON string)
+    string? imageUrl,        
+    string? externalId,      
+    string? metadata,
+    string? fileAttachment,  // ADD THIS
+    string? fileName,        // ADD THIS
+    string? fileType         // ADD THIS     
 );
 
 public record UpdateEntryReqDto(
     string? title,
     string? description,
-    string? entryType,   // string on purpose
+    string? entryType,   
     string? category,
     string? sourceApi,
     DateTime? eventDate,
     string? externalUrl,
-    string? imageUrl,        // NEW
-    string? externalId,      // NEW
-    string? metadata         // NEW
+    string? imageUrl,        
+    string? externalId,      
+    string? metadata,
+    string? fileAttachment,  // ADD THIS
+    string? fileName,        // ADD THIS
+    string? fileType         // ADD THIS       
 );
 
 

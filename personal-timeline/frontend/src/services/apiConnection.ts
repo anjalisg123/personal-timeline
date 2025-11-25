@@ -1,36 +1,3 @@
-// import type { ApiConnection } from '../types/ApiConnection';
-
-// let connections: ApiConnection[] = [
-//   { provider: 'github', isActive: true, lastSyncAt: '2025-10-28T22:16:00Z' },
-//   { provider: 'strava', isActive: false },
-//   { provider: 'spotify', isActive: false },
-// ];
-
-// export const apiService = {
-//   async listConnections() {
-//     return connections;
-//   },
-//   async connect(provider: ApiConnection['provider']) {
-//     const idx = connections.findIndex((c) => c.provider === provider);
-//     if (idx === -1) connections.push({ provider, isActive: true, lastSyncAt: new Date().toISOString() });
-//     else connections[idx] = { ...connections[idx], isActive: true, lastSyncAt: new Date().toISOString() };
-//     return true;
-//   },
-//   async disconnect(provider: ApiConnection['provider']) {
-//     const idx = connections.findIndex((c) => c.provider === provider);
-//     if (idx !== -1) connections[idx] = { ...connections[idx], isActive: false };
-//     return true;
-//   },
-//   async triggerSync(provider: ApiConnection['provider']) {
-//     const idx = connections.findIndex((c) => c.provider === provider);
-//     if (idx !== -1) connections[idx] = { ...connections[idx], lastSyncAt: new Date().toISOString() };
-//     // could add new mock entries here
-//     return { synced: true };
-//   },
-// };
-
-
-
 import { api } from "../lib/api";
 import type { ApiConnection } from "../types/ApiConnection";
 
@@ -54,7 +21,7 @@ export const apiConnections = {
     }));
   },
 
-  // For now we accept tokens via prompt (dev flow). In real OAuth, backend will handle redirect.
+
   async connect(provider: ApiConnection['provider'], tokens?: { accessToken?: string; refreshToken?: string; tokenExpiresAt?: string; settings?: string }) {
     await api(`/api/connections`, {
       method: "POST",

@@ -2,7 +2,7 @@ import type { User } from '../types/User';
 
 export const authService = {
   async loginWithProvider(provider: 'google' | 'github') {
-    // mock: in real app, redirect to backend /auth/{provider}
+
     const user: User = {
       id: 1,
       displayName: 'Anjali Gudimani',
@@ -14,7 +14,7 @@ export const authService = {
     return { user, token };
   },
   async me(token?: string): Promise<User | null> {
-    // mock returns same user if token exists
+
     if (!token) return null;
     return {
       id: 1,

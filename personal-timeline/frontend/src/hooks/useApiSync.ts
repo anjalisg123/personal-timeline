@@ -1,39 +1,8 @@
-// import { useCallback } from "react";
-// import type { ApiConnection } from "../types/ApiConnection";
-// import { apiConnections } from "../services/apiConnection";
-
-// export function useApiSync() {
-//   const listConnections = useCallback(async (): Promise<ApiConnection[]> => {
-//     return await apiConnections.list();
-//   }, []);
-
-//   const connect = useCallback(async (provider: ApiConnection['provider']) => {
-//     // Dev-only: prompt for token if you want
-//     const accessToken = window.prompt(`Enter ${provider} access token (optional for dev; leave blank)`) || undefined;
-//     await apiConnections.connect(provider, { accessToken });
-//   }, []);
-
-//   const disconnect = useCallback(async (provider: ApiConnection['provider']) => {
-//     await apiConnections.disconnect(provider);
-//   }, []);
-
-//   const triggerSync = useCallback(async (provider: ApiConnection['provider']) => {
-//     return await apiConnections.sync(provider);
-//   }, []);
-
-//   return { listConnections, connect, disconnect, triggerSync };
-// }
-
-
-
-
-
-
 import { api } from "../lib/api";
 import type { ApiConnection } from "../types/ApiConnection";
-import { API_BASE } from "../lib/api";
 
-// Providers we show, even if none exists in DB yet
+
+
 const ALL: ApiConnection["provider"][] = ["github", "strava", "spotify", "todoist"];
 
 type Row = {
@@ -58,15 +27,12 @@ export function useApiSync() {
     });
   };
 
-  // const connect = async (provider: ApiConnection["provider"]) => {
-  //   await api(`/api/connections/${provider}/connect`, { method: "POST" });
-  // };
 
   const connect = async (provider: "github" | "strava" | "spotify" | "todoist") => {
     if (provider === "strava") {
-      // Do an XHR so Authorization header is included
+
       const { url } = await api<{ url: string }>("/api/oauth/strava/connect-url", { method: "POST" });
-      window.location.href = url; // now navigate to Strava
+      window.location.href = url; 
       return;
     }
     if (provider === "spotify") {

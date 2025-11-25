@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import Navigation from "./Navigation";
-import "/src/index.css"; // keep
+import "/src/index.css"; 
 
 interface LayoutProps {
   children: ReactNode;

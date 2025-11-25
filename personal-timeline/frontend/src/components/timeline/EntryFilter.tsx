@@ -50,7 +50,6 @@ const EntryFilter: React.FC = () => {
             <option value="github">GitHub</option>
             <option value="strava">Strava</option>
             <option value="spotify">Spotify</option>
-            <option value="todoist">Todoist</option>
           </select>
         </div>
 

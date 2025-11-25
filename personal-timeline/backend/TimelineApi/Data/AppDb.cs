@@ -11,7 +11,7 @@ public class AppDb : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<TimelineEntry> Entries => Set<TimelineEntry>();
-    // backend/TimelineApi/Data/AppDb.cs
+
     public DbSet<ApiConnection> Connections => Set<ApiConnection>();
 
     protected override void OnModelCreating(ModelBuilder b)
@@ -21,7 +21,7 @@ public class AppDb : DbContext
         b.Entity<TimelineEntry>()
             .HasIndex(e => new { e.UserId, e.EventDate });
 
-        // Unique per user+provider
+
         b.Entity<ApiConnection>()
             .HasIndex(c => new { c.UserId, c.ApiProvider })
             .IsUnique();

@@ -1,17 +1,3 @@
-// import React from 'react';
-// import { TimelineProvider } from '../context/TimelineContext';
-// import TimelineView from '../components/timeline/TimelineView';
-
-// const TimelinePage: React.FC = () => (
-//   <TimelineProvider>
-//     <TimelineView />
-//   </TimelineProvider>
-// );
-
-// export default TimelinePage;
-
-
-
 import React, { useEffect, useState } from "react";
 import { listEntries, type Entry } from "../services/entries";
 

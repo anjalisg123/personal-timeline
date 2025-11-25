@@ -104,21 +104,15 @@ body{background:var(--bg);color:var(--text)}
 @media (max-width: 640px){ .tiles{grid-template-columns:repeat(2,minmax(0,1fr))} .dash-title{font-size:38px} }
 
 
-
-/* ================================
-   Personal Timeline — Consolidated Styles
-   (cards, text, buttons, modal, form)
-   ================================ */
-
 /* ---------- Design tokens ---------- */
 :root{
   --bg: #f8fafc;
   --card: #ffffff;
-  --ink: #0b1220;        /* titles */
-  --ink-2: #111827;      /* body / buttons */
+  --ink: #0b1220;        
+  --ink-2: #111827;      
   --muted: #64748b;
   --subtle: #e5e7eb;
-  --ring: rgba(37,99,235,.15);     /* blue-ish focus ring */
+  --ring: rgba(37,99,235,.15);     
   --shadow-1: 0 12px 28px rgba(2,6,23,.08);
   --shadow-2: 0 20px 40px rgba(2,6,23,.08);
 }
@@ -287,15 +281,15 @@ body{background:var(--bg);color:var(--text)}
 /* --- CARD LAYOUT: emoji | title | time at top --- */
 .tl-entry{
   display:grid;
-  grid-template-columns: 56px 1fr auto;   /* emoji | title | time */
-  grid-template-rows: auto 1fr auto auto; /* header | desc grows | tags | actions */
+  grid-template-columns: 56px 1fr auto;   
+  grid-template-rows: auto 1fr auto auto; 
   grid-template-areas:
     "icon  title  date"
     ".     desc   desc"
     ".     tags   tags"
     ".     actions actions";
   gap:14px 16px;
-  min-height: 220px; /* gives room so actions can sit at the bottom */
+  min-height: 220px; 
 }
 
 /* If your icon & date are wrapped in .tl-left, make it layout-neutral */
@@ -306,7 +300,7 @@ body{background:var(--bg);color:var(--text)}
 .tl-title{
   grid-area: title;
   margin:0;
-  align-self:center;          /* vertically center title between emoji & time */
+  align-self:center;         
 }
 .tl-datepill{
   grid-area: date;
@@ -320,17 +314,17 @@ body{background:var(--bg);color:var(--text)}
 .tl-actions{
   grid-area: actions;
   justify-self:end;
-  align-self:end;             /* sits at the bottom row of the card */
+  align-self:end;             
   gap:10px;
 }
 
-/* make primary/ghost/danger buttons look good at the bottom */
+
 .tl-btn{ height:40px; padding:0 14px; }
 .tl-btn-primary{ background:#0f172a; color:#fff; border-color:#0f172a; }
 .tl-btn-danger{ background:#fff; color:#991b1b; border-color:rgba(220,38,38,.55); }
 .tl-btn-ghost{ background:#fff; }
 
-/* --- RESPONSIVE: stack nicely on mobile --- */
+
 @media (max-width: 900px){
   .tl-entry{
     grid-template-columns: 44px 1fr;
@@ -356,7 +350,7 @@ body{background:var(--bg);color:var(--text)}
 
 /* card: less padding, radius, gap, height */
 .tl-entry{
-  grid-template-columns: 48px 1fr auto; /* emoji | title | time */
+  grid-template-columns: 48px 1fr auto; 
   gap:12px 14px;
   padding:18px;
   border-radius:16px;
@@ -390,7 +384,7 @@ body{background:var(--bg);color:var(--text)}
   }
 }
 
-/* Remove any inner panel look inside the filter card */
+
 .entry-filter .entry-filter,
 .entry-filter > form,
 .entry-filter fieldset,
@@ -404,7 +398,7 @@ body{background:var(--bg);color:var(--text)}
   margin: 0 !important;
 }
 
-/* Make sure only the outer wrapper provides spacing */
+
 .entry-filter .tl-row{ padding: 0; }
 
 
@@ -522,7 +516,7 @@ button.bg-black.text-white:hover{filter:brightness(.95)}
   --nav-text: #0f172a;
   --muted: #64748b;
   --tab-bg: #f3f4f6;
-  --tab-active: #2563eb; /* blue like your sample */
+  --tab-active: #2563eb; 
 }
 
 .app-header{
@@ -598,13 +592,13 @@ button.bg-black.text-white:hover{filter:brightness(.95)}
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
-  text-align: center !important;           /* <-- centers the text */
-  color: #6b7280;               /* muted like your sample */
+  text-align: center !important;           
+  color: #6b7280;              
   font-size: 14px;
 }
 .footer-content p{ margin:0; }
 
-/* optional: match the TodoList bottom spacing on small screens */
+
 @media (max-width: 640px){
   .footer{ padding: 24px 0 32px; }
   .footer-content{ padding: 0 16px; }

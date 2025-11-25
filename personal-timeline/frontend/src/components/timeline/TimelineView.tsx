@@ -5,13 +5,13 @@ import EntryForm from "./EntryForm";
 import Modal from "../ui/Modal";
 import "/src/index.css";
 import TimelineEntry from "./TimelineEntry";
-import type { TimelineEntry as T } from "../../types/TimelineEntry"; // ⬅️ add this
+import type { TimelineEntry as T } from "../../types/TimelineEntry"; 
 
 const TimelineView: React.FC = () => {
   const { entries, loading, remove, add, update } = useTimeline();
   const [showModal, setShowModal] = useState(false);
 
-  // 🔧 edit state
+
   const [editing, setEditing] = useState<T| null>(null);
 
   const formId = "timeline-entry-form";
@@ -46,7 +46,7 @@ const TimelineView: React.FC = () => {
               await remove(id);
             }
           }}
-          onEdit={(entry) => setEditing(entry)}   // ⬅️ enable Edit button
+          onEdit={(entry) => setEditing(entry)}   
         />
       ))}
       </div>
@@ -89,7 +89,7 @@ const TimelineView: React.FC = () => {
             formId={editFormId}
             initial={editing}
             onSubmit={async (data) => {
-              // turn full form back into a patch
+
               await update(editing.id, {
                 title: data.title,
                 description: data.description ?? undefined,

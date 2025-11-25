@@ -1,25 +1,11 @@
+
+
 import React, { useEffect, useMemo, useState } from 'react';
 import '/src/index.css';
-
-// If you already have a timeline context, you can swap this for it.
-// For a drop‑in experience we read from the mock timelineService used earlier.
 import { timelineService } from '../services/timelineService';
 import type { TimelineEntry } from '../types/TimelineEntry';
 import { useLocation, useNavigate } from 'react-router-dom';
-
-
-
-const Card: React.FC<{ children: React.ReactNode; className?: string }>=({ children, className })=> (
-  <div className={`dash-card ${className ?? ''}`}>{children}</div>
-);
-
-function formatNumber(n: number) {
-  return new Intl.NumberFormat().format(n);
-}
-
-function daysBetween(a: Date, b: Date) {
-  return Math.floor((+a - +b) / (1000 * 60 * 60 * 24));
-}
+import { API_BASE } from '../lib/api';
 
 const Dashboard: React.FC = () => {
   const [entries, setEntries] = useState<TimelineEntry[]>([]);
@@ -27,7 +13,6 @@ const Dashboard: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
-
 
   useEffect(() => {
     if ((location.state as any)?.justSignedIn) {
@@ -37,8 +22,6 @@ const Dashboard: React.FC = () => {
       return () => clearTimeout(t);
     }
   }, [location.state, navigate]);
-
-
 
   useEffect(() => {
     (async () => {
@@ -61,7 +44,6 @@ const Dashboard: React.FC = () => {
     const achievements = entries.filter((e) => e.entryType === 'Achievement').length;
     const milestones = entries.filter((e) => e.entryType === 'Milestone').length;
 
-    // Simple streak: count consecutive days back from today that have at least 1 entry
     const byDay = new Set(entries.map((e) => new Date(e.eventDate).toDateString()));
     let streak = 0;
     for (let i = 0; ; i++) {
@@ -71,9 +53,8 @@ const Dashboard: React.FC = () => {
       else break;
     }
 
-    // Source breakdown
     const bySource: Record<string, number> = {};
-    for (const e of entries) bySource[e.sourceApi] = (bySource[e.sourceApi] ?? 0) + 1;
+    for (const e of entries) bySource[e.sourceApi || 'manual'] = (bySource[e.sourceApi || 'manual'] ?? 0) + 1;
     const sourceArr = Object.entries(bySource).sort((a, b) => b[1] - a[1]);
 
     return {
@@ -91,17 +72,32 @@ const Dashboard: React.FC = () => {
     [entries]
   );
 
-  return (
+  const getEntryLink = (e: TimelineEntry) => {
+    if (e.externalUrl) return e.externalUrl;
+    if (e.fileAttachment) {
+      if (e.fileAttachment.startsWith('http')) return e.fileAttachment;
+      return `${API_BASE}${e.fileAttachment}`;
+    }
+    return null;
+  };
 
+  // --- NEW: Helper for Date Consistency ---
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    const normalized = dateString.endsWith("Z") ? dateString : `${dateString}Z`;
+    return new Date(normalized).toLocaleString();
+  };
+  // ----------------------------------------
+
+  return (
     <div className="p-6">
       {show && (
         <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-green-800">
           Signed in successfully!
         </div>
       )}
-      {
-        <div className="dash-wrap">
-        {/* Header */}
+      
+      <div className="dash-wrap">
         <header className="dash-hero">
           <div className="dash-logo">📊</div>
           <div>
@@ -110,7 +106,6 @@ const Dashboard: React.FC = () => {
           </div>
         </header>
     
-        {/* Stat tiles */}
         <section className="tiles">
           <div className="tile">
             <div className="tile-icon">📝</div>
@@ -139,9 +134,7 @@ const Dashboard: React.FC = () => {
           </div>
         </section>
     
-        {/* Body: recent list + sidebar */}
         <section className="dash-body">
-          {/* Recent Activity (left) */}
           <div className="card">
             <div className="card-head">
               <span className="card-emoji">🗂️</span>
@@ -150,32 +143,36 @@ const Dashboard: React.FC = () => {
             <ul className="recent">
               {loading && <li className="muted">Loading…</li>}
               {!loading && recent.length === 0 && <li className="muted">No recent entries.</li>}
-              {recent.map((e) => (
-                <li key={e.id} className="recent-item">
-                  <div className="recent-left">
-                    <span className="pill" data-color={e.sourceApi}>
-                      {e.sourceApi}
-                    </span>
-                    <div className="recent-title">{e.title}</div>
-                    <div className="recent-meta">
-                      {new Date(e.eventDate).toLocaleString()}
-                      {e.entryType && <span>• {e.entryType}</span>}
-                      {e.category && <span>• {e.category}</span>}
+              
+              {recent.map((e) => {
+                const link = getEntryLink(e);
+                return (
+                  <li key={e.id} className="recent-item">
+                    <div className="recent-left">
+                      <span className="pill" data-color={e.sourceApi}>
+                        {e.sourceApi}
+                      </span>
+                      <div className="recent-title">{e.title}</div>
+                      <div className="recent-meta">
+                        {/* Use the new formatDate helper here */}
+                        {formatDate(e.eventDate)}
+                        {e.entryType && <span>• {e.entryType}</span>}
+                        {e.category && <span>• {e.category}</span>}
+                      </div>
                     </div>
-                  </div>
-                  <div className="recent-right">
-                    {e.externalUrl && (
-                      <a className="link" href={e.externalUrl} target="_blank" rel="noreferrer">
-                        Open ↗
-                      </a>
-                    )}
-                  </div>
-                </li>
-              ))}
+                    <div className="recent-right">
+                      {link && (
+                        <a className="link" href={link} target="_blank" rel="noreferrer">
+                          Open ↗
+                        </a>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
     
-          {/* Sidebar (right) */}
           <aside className="side">
             <div className="card">
               <div className="card-head">
@@ -202,11 +199,8 @@ const Dashboard: React.FC = () => {
           </aside>
         </section>
       </div>
-      }
     </div>
-    // replace the return (...) of your Dashboard component with this:
-  
-);
+  );
 };
 
 export default Dashboard;

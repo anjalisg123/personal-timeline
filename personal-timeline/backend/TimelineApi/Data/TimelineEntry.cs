@@ -10,16 +10,21 @@ public class TimelineEntry
     public string Title { get; set; }
     public string Description { get; set; }
     public DateTime EventDate { get; set; }
-    public string EntryType { get; set; } // Achievement, Activity, Milestone, Memory
+    public string EntryType { get; set; } 
     public string Category { get; set; }
     public string ImageUrl { get; set; }
     public string ExternalUrl { get; set; }
-    public string SourceApi { get; set; } // Which API this came from
-    public string ExternalId { get; set; } // ID from external API
-    public string Metadata { get; set; } // JSON for additional data
+    public string SourceApi { get; set; } 
+    public string ExternalId { get; set; } 
+    public string Metadata { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    // NEW FILE ATTACHMENT FIELDS
+    public string FileAttachment { get; set; } = string.Empty;   // base64 data or URL
+    public string FileName { get; set; } = string.Empty;
+    public string FileType { get; set; } = string.Empty;         // e.g. "image/png", "application/pdf"
     
-    // Navigation properties
+
     public User User { get; set; }
 }

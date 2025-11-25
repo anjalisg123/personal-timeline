@@ -16,20 +16,20 @@ const GoogleLoginButton: React.FC<Props> = ({ onSuccess, onError }) => {
 
   useEffect(() => {
     if (!window.google) return;
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID; // put your client id in .env
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID; 
 
     window.google.accounts.id.initialize({
       client_id: clientId,
       callback: async (resp: any) => {
         try {
-          const idToken = resp.credential; // Google ID token
+          const idToken = resp.credential; 
           const res = await fetch("http://localhost:5001/api/auth/google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ idToken })
           });
           if (!res.ok) throw new Error("Auth failed");
-          const data = await res.json(); // { token, user }
+          const data = await res.json(); 
           onSuccess(data.token, data.user);
         } catch (e: any) {
           onError?.(e.message || "Login failed");

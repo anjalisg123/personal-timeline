@@ -10,7 +10,7 @@ const timezones = [
 const Profile: React.FC = () => {
   const { user, updateUser } = useAuth();
 
-  // Use displayName to match backend & context
+
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
   const [timezone, setTimezone]       = useState(user?.timezone ?? "America/Chicago");
   const [bio, setBio]                 = useState(user?.bio ?? "");
@@ -18,7 +18,7 @@ const Profile: React.FC = () => {
   const [message, setMessage]         = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Keep form in sync when user loads/changes (fetched from /api/me in context)
+
   useEffect(() => {
     if (!user) return;
     setDisplayName(user.displayName ?? "");
@@ -36,7 +36,6 @@ const Profile: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
-    // Preview only; later we can upload and persist
     updateUser({ picture: url });
   };
 
@@ -45,8 +44,6 @@ const Profile: React.FC = () => {
     setSaving(true);
     setMessage(null);
     try {
-      // Still mocked locally (no PUT yet). When ready, call your API here.
-      // await api("/api/me", { method: "PUT", body: JSON.stringify({ displayName, timezone, bio }) });
       updateUser({ displayName, timezone, bio });
       setMessage("Profile saved successfully.");
     } catch {

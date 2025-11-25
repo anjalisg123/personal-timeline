@@ -41,7 +41,7 @@ export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [filters]);
 
   useEffect(() => {
-    // initial load + whenever filters change
+
     refresh();
   }, [refresh]);
 
@@ -56,16 +56,16 @@ export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const remove = async (id: string) => {
-    // Optimistic UI: drop it locally right away
+
     setEntries(prev => prev.filter(e => String(e.id) !== String(id)));
     try {
       await timelineService.remove(id);
     } catch (err) {
-      // If API fails, reload from server to recover the UI
+
       await refresh();
       throw err;
     }
-    // Optional: finalize with a fresh read (keeps UI consistent if server mutates other fields)
+
     await refresh();
   };
 

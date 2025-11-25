@@ -3,6 +3,6 @@ export interface User {
     displayName: string;
     email: string;
     profileImageUrl?: string;
-    // timezone?: string;
+
 }
     
