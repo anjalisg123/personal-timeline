@@ -347,7 +347,7 @@ app.MapPut("/api/me", [Authorize] async (ClaimsPrincipal user, AppDb db, UpdateP
     return Results.NoContent();
 });
 
-// ================== Entries (professor model) ==================
+
 app.MapGet("/api/entries", [Authorize] async (ClaimsPrincipal user, AppDb db) =>
 {
     var uid = GetUserIdInt(user);
@@ -598,17 +598,13 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
         var after = row.LastSyncAt ?? DateTime.UtcNow.AddMonths(-6);
         var afterUnix = new DateTimeOffset(after).ToUnixTimeSeconds();
 
-        var page = 1;
+        var url = $"https://www.strava.com/api/v3/athlete/activities?after={afterUnix}&per_page=5&page=1";
+        var resp = await hc.GetAsync(url);
         var total = 0;
-        while (true)
+
+        if (resp.IsSuccessStatusCode)
         {
-            var url = $"https://www.strava.com/api/v3/athlete/activities?after={afterUnix}&per_page=50&page={page}";
-            var resp = await hc.GetAsync(url);
-            if (!resp.IsSuccessStatusCode) break;
-
             var arr = JsonDocument.Parse(await resp.Content.ReadAsStringAsync()).RootElement.EnumerateArray().ToArray();
-            if (arr.Length == 0) break;
-
             foreach (var a in arr)
             {
                 var id = a.GetProperty("id").GetInt64();
@@ -650,19 +646,16 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
                     };
                     db.Entries.Add(existing);
                 }
-                else
-                {
-                    existing.Title = name;
-                    existing.Description = $"{sport} • {(distance/1000.0):0.##} km";
-                    existing.EventDate = start;
-                    existing.Metadata = JsonSerializer.Serialize(new { sport, distance, polyline = poly });
-                    existing.UpdatedAt = DateTime.UtcNow;
+                else 
+                { 
+                    existing.Title = name; 
+                    existing.Description = $"{sport} • {(distance/1000.0):0.##} km"; 
+                    existing.Metadata = JsonSerializer.Serialize(new { sport, distance, polyline = poly }); 
+                    existing.UpdatedAt = DateTime.UtcNow; 
                 }
                 total++;
             }
-            page++;
         }
-
         row.LastSyncAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
         return Results.Ok(new { ok = true, provider = "strava", synced = total, lastSyncAt = row.LastSyncAt });
@@ -679,7 +672,7 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
         var after = row.LastSyncAt ?? DateTime.UtcNow.AddMonths(-3);
         var afterMs = new DateTimeOffset(after).ToUnixTimeMilliseconds();
 
-        var url = $"https://api.spotify.com/v1/me/player/recently-played?limit=50&after={afterMs}";
+        var url = $"https://api.spotify.com/v1/me/player/recently-played?limit=5&after={afterMs}";
         var resp = await hc.GetAsync(url);
         if (!resp.IsSuccessStatusCode)
             return Results.StatusCode((int)resp.StatusCode);
@@ -754,7 +747,7 @@ app.MapPost("/api/connections/{provider}/sync", [Authorize] async (string provid
         var count = 0;
 
 
-        var eventsResp = await hc.GetAsync($"https://api.github.com/users/{login}/events?per_page=100");
+        var eventsResp = await hc.GetAsync($"https://api.github.com/users/{login}/events?per_page=5");
         eventsResp.EnsureSuccessStatusCode();
         var eventsRoot = JsonDocument.Parse(await eventsResp.Content.ReadAsStringAsync()).RootElement;
 
