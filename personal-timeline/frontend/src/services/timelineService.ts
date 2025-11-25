@@ -24,7 +24,7 @@ type ApiEntry = {
   eventDate: string;         
   createdAt?: string | null;
   externalUrl?: string | null;
-  metadata?: string | null;        // <--- Ensure this is typed
+  metadata?: string | null;        
   fileAttachment?: string | null;  
   fileName?: string | null;         
   fileType?: string | null;        
@@ -46,7 +46,7 @@ function fromApi(e: ApiEntry): TimelineEntry {
     fileType: e.fileType ?? undefined,
     sourceApi: normSource(e.sourceApi ?? undefined),
     externalId: undefined,
-    metadata: e.metadata ?? undefined, // <--- CHANGED THIS: It was 'undefined' before
+    metadata: e.metadata ?? undefined, 
     createdAt: e.createdAt ?? undefined,
     updatedAt: undefined,
     externalUrl: e.externalUrl ?? undefined,
@@ -62,7 +62,7 @@ function toApiCreate(e: Omit<TimelineEntry, "id" | "createdAt" | "updatedAt">) {
     sourceApi: normSource(e.sourceApi as any),
     eventDate: e.eventDate,
     externalUrl: e.externalUrl ?? null,
-    metadata: e.metadata ?? "{}",      // <--- Pass metadata back on create
+    metadata: e.metadata ?? "{}",      
     fileAttachment: e.fileAttachment ?? null,
     fileName: e.fileName ?? null,
     fileType: e.fileType ?? null,
@@ -78,7 +78,7 @@ function toApiUpdate(patch: Partial<TimelineEntry>) {
     sourceApi: patch.sourceApi ? normSource(patch.sourceApi as any) : undefined,
     eventDate: patch.eventDate,
     externalUrl: patch.externalUrl,
-    metadata: patch.metadata,         // <--- Pass metadata back on update
+    metadata: patch.metadata,         
     fileAttachment: patch.fileAttachment,
     fileName: patch.fileName,
     fileType: patch.fileType,
@@ -143,5 +143,5 @@ export const timelineApiService = {
   },
 };
 
-// Also update the alias if you are using 'timelineService' elsewhere
+
 export const timelineService = timelineApiService;

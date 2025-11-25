@@ -3,7 +3,7 @@ import type { ApiConnection } from "../types/ApiConnection";
 
 
 
-const ALL: ApiConnection["provider"][] = ["github", "strava", "spotify", "todoist"];
+const ALL: ApiConnection["provider"][] = ["github", "strava", "spotify"];
 
 type Row = {
   provider: string;
@@ -28,7 +28,7 @@ export function useApiSync() {
   };
 
 
-  const connect = async (provider: "github" | "strava" | "spotify" | "todoist") => {
+  const connect = async (provider: "github" | "strava" | "spotify" ) => {
     if (provider === "strava") {
 
       const { url } = await api<{ url: string }>("/api/oauth/strava/connect-url", { method: "POST" });

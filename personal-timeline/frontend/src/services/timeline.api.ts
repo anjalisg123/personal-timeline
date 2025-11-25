@@ -41,9 +41,9 @@ function fromApi(e: ApiEntry): TimelineEntry {
     entryType: normEntryType(e.entryType ?? undefined),
     category: e.category ?? undefined,
     imageUrl: undefined,        
-    fileAttachment: e.fileAttachment ?? undefined,  // ADD THIS
-    fileName: e.fileName ?? undefined,              // ADD THIS
-    fileType: e.fileType ?? undefined,              // ADD THIS                  
+    fileAttachment: e.fileAttachment ?? undefined,  
+    fileName: e.fileName ?? undefined,              
+    fileType: e.fileType ?? undefined,                           
     sourceApi: normSource(e.sourceApi ?? undefined),
     externalId: undefined,
     metadata: undefined,
@@ -62,9 +62,9 @@ function toApiCreate(e: Omit<TimelineEntry, "id" | "createdAt" | "updatedAt">) {
     sourceApi: normSource(e.sourceApi as any),
     eventDate: e.eventDate,
     externalUrl: e.externalUrl ?? null,
-    fileAttachment: e.fileAttachment ?? null,  // ADD THIS
-    fileName: e.fileName ?? null,              // ADD THIS
-    fileType: e.fileType ?? null,              // ADD THIS
+    fileAttachment: e.fileAttachment ?? null,  
+    fileName: e.fileName ?? null,              
+    fileType: e.fileType ?? null,              
 
   };
 }
@@ -78,9 +78,9 @@ function toApiUpdate(patch: Partial<TimelineEntry>) {
     sourceApi: patch.sourceApi ? normSource(patch.sourceApi as any) : undefined,
     eventDate: patch.eventDate,
     externalUrl: patch.externalUrl,
-    fileAttachment: patch.fileAttachment,  // ADD THIS
-    fileName: patch.fileName,              // ADD THIS
-    fileType: patch.fileType,              // ADD THIS
+    fileAttachment: patch.fileAttachment,  
+    fileName: patch.fileName,             
+    fileType: patch.fileType,              
   };
 }
 
