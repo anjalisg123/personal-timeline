@@ -23,11 +23,11 @@ public class UploadController : ControllerBase
         if (file == null || file.Length == 0)
             return BadRequest(new { error = "No file uploaded" });
 
-        // Validate file size (10MB max)
+
         if (file.Length > 10 * 1024 * 1024)
             return BadRequest(new { error = "File too large. Maximum size is 10MB" });
 
-        // Validate file type
+
         var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp", 
                                    "application/pdf", "application/msword",
                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
@@ -35,17 +35,17 @@ public class UploadController : ControllerBase
         if (!allowedTypes.Contains(file.ContentType))
             return BadRequest(new { error = "Invalid file type" });
 
-        // Create uploads directory if it doesn't exist
+
         var uploadsPath = Path.Combine(_env.ContentRootPath, "uploads");
         if (!Directory.Exists(uploadsPath))
             Directory.CreateDirectory(uploadsPath);
 
-        // Generate unique filename
+
         var extension = Path.GetExtension(file.FileName);
         var uniqueFileName = $"{Guid.NewGuid()}{extension}";
         var filePath = Path.Combine(uploadsPath, uniqueFileName);
 
-        // Save file
+
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await file.CopyToAsync(stream);

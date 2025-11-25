@@ -14,7 +14,7 @@ function SourceIcon({ source }: { source: T['sourceApi'] }) {
 type Props = { entry: T; onEdit?: (e: T) => void; onDelete?: (id: number) => void };
 
 const TimelineEntry: React.FC<Props> = ({ entry, onEdit, onDelete }) => {
-  const [showMeta, setShowMeta] = useState(false); // <--- NEW: Toggle state
+  const [showMeta, setShowMeta] = useState(false); 
 
   const handleDelete = () => {
     if (!onDelete) return;
@@ -51,7 +51,7 @@ const TimelineEntry: React.FC<Props> = ({ entry, onEdit, onDelete }) => {
   } catch (e) {
     // invalid json, ignore
   }
-  // --------------------------------
+
 
   return (
     <article className="tl-entry">

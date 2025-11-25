@@ -11,7 +11,7 @@ const EntryForm: React.FC<Props> = ({ initial, onSubmit, formId }) => {
   const [form, setForm] = useState<Omit<TimelineEntry, 'id' | 'createdAt' | 'updatedAt'>>({
     title: initial?.title ?? "",
     description: initial?.description ?? "",
-    // Default to NOW if no date provided
+
     eventDate: initial?.eventDate ?? new Date().toISOString(),
     entryType: (initial?.entryType as any) ?? "Note",
     category: initial?.category ?? "",
@@ -29,16 +29,14 @@ const EntryForm: React.FC<Props> = ({ initial, onSubmit, formId }) => {
 
   const set = (k: keyof typeof form, v: any) => setForm(s => ({ ...s, [k]: v }));
 
-  // --- NEW: Helper to format Date for <input> correctly ---
+
   const toLocalInputString = (isoString: string) => {
     const date = new Date(isoString);
-    // Subtract the timezone offset to get the correct "wall clock" time in the string
-    // offset is in minutes, convert to ms. 
-    // Example: Chicago is -300 mins. timestamp - (-300) adds 5 hours.
+
     const local = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
-    return local.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+    return local.toISOString().slice(0, 16); 
   };
-  // -------------------------------------------------------
+ 
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -102,9 +100,7 @@ const EntryForm: React.FC<Props> = ({ initial, onSubmit, formId }) => {
             className="ef-input"
             value={toLocalInputString(form.eventDate)}
             onChange={(e) => {
-              // When user picks a time, 'e.target.value' is local string.
-              // new Date() creates a Date object from that local time.
-              // .toISOString() converts it back to UTC for the database.
+
               set("eventDate", new Date(e.target.value).toISOString());
             }}
           />

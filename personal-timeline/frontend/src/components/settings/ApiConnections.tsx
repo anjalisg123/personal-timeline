@@ -12,20 +12,20 @@ const ApiConnections: React.FC = () => {
 
   useEffect(() => { refresh(); }, []);
 
-  // --- NEW: Date Formatting Helper (Fixes the Timezone Bug) ---
+
   const formatDate = (dateString?: string | null) => {
     if (!dateString) return '';
-    // Force UTC interpretation by appending 'Z' if missing
+
     const normalized = dateString.endsWith('Z') ? dateString : `${dateString}Z`;
     return new Date(normalized).toLocaleString();
   };
-  // ------------------------------------------------------------
+
 
   const handleSync = async (provider: string) => {
     setSyncing(prev => ({ ...prev, [provider]: true }));
     try {
       await triggerSync(provider as any);
-      await refresh(); // Refresh list to show new "Last Sync" time
+      await refresh(); 
     } finally {
       setSyncing(prev => ({ ...prev, [provider]: false }));
     }
