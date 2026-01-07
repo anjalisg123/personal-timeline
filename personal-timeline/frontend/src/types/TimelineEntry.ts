@@ -1,5 +1,5 @@
-export type EntryType = 'Achievement' | 'Activity' | 'Milestone' | 'Memory';
-export type SourceApi = 'manual' | 'github' | 'strava' | 'spotify' ;
+export type EntryType = 'Achievement' | 'Activity' | 'Milestone' | 'Memory'| 'Note';
+export type SourceApi = 'manual' | 'github' | 'strava' | 'spotify' | 'todoist' ;
 
 export interface TimelineEntry {
   id: number;                 

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TimelineApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+127f634d4b86d9aa7b214bbfe7f5e411acf5b514")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dcdc2b114596199679a43bfcbb4a240963487e87")]
 [assembly: System.Reflection.AssemblyProductAttribute("TimelineApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TimelineApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
